@@ -31,7 +31,8 @@ be found at [https://hexdocs.pm/globalconst](https://hexdocs.pm/globalconst).
 ## Usage
 
 Create a new global const map and get the value
-```
+
+```elixir
 GlobalConst.new(GlobalMap, %{a: 1, b: 2})
 1 == GlobalMap.get(:a)
 2 == GlobalMap.get(:b)
