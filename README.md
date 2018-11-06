@@ -10,6 +10,14 @@ So Converting entities to a named module is a good approach.
 
 ## Performance
 
+```
+benchmark name              iterations   average time
+globalconst get              100000000   0.03 µs/op
+globalconst get(10000keys)   100000000   0.06 µs/op
+fastglobal get                10000000   0.29 µs/op
+ets get                         500000   7.93 µs/op
+agent get                       100000   14.95 µs/op
+```
 
 ## Installation
 
