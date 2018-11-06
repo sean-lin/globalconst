@@ -1,5 +1,7 @@
 # GlobalConst
 
+[![Hex.pm Version](https://img.shields.io/hexpm/v/globalconst.svg?style=flat)](https://hex.pm/packages/globalconst)
+
 GlobalConst converts large Key-Value entities to a module to make fast accessing by thousands of processes.
 
 ## Thanks
