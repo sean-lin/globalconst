@@ -8,7 +8,7 @@ GlobalConst converts large Key-Value entities to a module to make fast accessing
 
 This library inspired by [FastGlobal](https://github.com/discordapp/fastglobal) and [mochiglobal](https://github.com/mochi/mochiweb/blob/master/src/mochiglobal.erl). 
 In our case, we has thousands of entities to save, and don't want to make so many modules. 
-So Converting entities to a named module is a good approach. 
+So converting entities to a named module is a good approach. 
 
 ## Performance
 
@@ -33,7 +33,7 @@ def deps do
 end
 ```
 
-Documentation can be found at [https://hexdocs.pm/globalconst](https://hexdocs.pm/globalconst).
+Documentation can be found at [https://hexdocs.pm/globalconst/](https://hexdocs.pm/globalconst/).
 
 ## Usage
 
@@ -43,6 +43,7 @@ Create a new global const map and get the value
 GlobalConst.new(GlobalMap, %{a: 1, b: 2})
 1 == GlobalMap.get(:a)
 2 == GlobalMap.get(:b)
+[:a, :b] == GlobalMap.keys()
 {:error, :global_const_not_found} = GlobalMap.get(:c)
 :default_value = GlobalMap.get(:c, :default_value)
 ```
