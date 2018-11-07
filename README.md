@@ -23,8 +23,7 @@ agent get                       100000   14.95 µs/op
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `globalconst` to your list of dependencies in `mix.exs`:
+Add it to `mix.exs`
 
 ```elixir
 def deps do
@@ -34,9 +33,7 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/globalconst](https://hexdocs.pm/globalconst).
+Documentation can be found at [https://hexdocs.pm/globalconst](https://hexdocs.pm/globalconst).
 
 ## Usage
 

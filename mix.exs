@@ -1,14 +1,17 @@
 defmodule GlobalConst.MixProject do
   use Mix.Project
 
+  @version "0.2.0"
+
   def project do
     [
       app: :globalconst,
-      version: "0.2.0",
+      version: @version,
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps(),
+      docs: docs(),
       name: :globalconst,
       source_url: "https://github.com/sean-lin/globalconst"
     ]
@@ -25,7 +28,8 @@ defmodule GlobalConst.MixProject do
   defp deps do
     [
       {:fastglobal, "~> 1.0", only: :dev},
-      {:benchfella, "~> 0.3.0", only: :dev}
+      {:benchfella, "~> 0.3.0", only: :dev},
+      {:ex_doc, "~> 0.19.1", only: :docs}
     ]
   end
 
@@ -40,6 +44,15 @@ defmodule GlobalConst.MixProject do
       links: %{
         "GitHub" => "https://github.com/sean-lin/globalconst"
       }
+    ]
+  end
+
+  defp docs do
+    [
+      extras: ["README.md"],
+      main: "readme",
+      source_ref: "v#{@version}",
+      source_url: "https://github.com/sean-lin/globalconst"
     ]
   end
 end
