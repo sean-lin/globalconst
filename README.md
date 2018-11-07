@@ -28,7 +28,7 @@ Add it to `mix.exs`
 ```elixir
 def deps do
   [
-    {:globalconst, "~> 0.1.0"}
+    {:globalconst, "~> 0.2.0"}
   ]
 end
 ```
