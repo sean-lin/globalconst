@@ -36,4 +36,12 @@ defmodule GlobalConstTest do
     GlobalConst.delete(DelDict)
     assert false == :code.is_loaded(DelDict)
   end
+
+  test "keys and cmp" do
+    data = %{a: 1, b: 1, c: 2}
+    mod = GlobalConst.new(DataMap, data)
+    assert Enum.sort(Map.keys(data)) == Enum.sort(mod.keys())
+    assert mod.cmp(data) == true
+    assert mod.cmp(%{a: 1, c: 2, b: 1, d: 4}) == false
+  end
 end
