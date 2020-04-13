@@ -1,13 +1,23 @@
 defmodule GlobalConstBench do
   use Benchfella
 
-  bench "globalconst get", module: gen_globalconst(TestConst) do
+  bench "globalconst get atom", module: gen_globalconst(TestConst, :atom) do
     module.get(:data)
     :ok
   end
 
-  bench "globalconst get(10000keys)", module: gen_globalconst(TestConst, 10000) do
+  bench "globalconst get string", module: gen_globalconst(TestConst, :any) do
+    module.get("data")
+    :ok
+  end
+
+  bench "globalconst get(10000keys) atom", module: gen_globalconst(TestConst, 10000, :atom) do
     module.get(:key9999)
+    :ok
+  end
+
+  bench "globalconst get(10000keys) string", module: gen_globalconst(TestConst, 10000, :any) do
+    module.get("key9999")
     :ok
   end
 
@@ -21,16 +31,21 @@ defmodule GlobalConstBench do
     :ok
   end
 
-  bench "ets get", ets: gen_ets() do
+  bench "ets get atom", ets: gen_ets(:atom) do
     :ets.lookup(ets, :data)
+    :ok
+  end
+
+  bench "ets get string", ets: gen_ets(:any) do
+    :ets.lookup(ets, "data")
     :ok
   end
 
   ## Private
 
   defp gen_fastglobal() do
-    FastGlobal.put(:data, gen_services(50))
-    :data
+    FastGlobal.put(:fg_data, gen_services(50))
+    :fg_data
   end
 
   defp gen_agent() do
@@ -38,23 +53,38 @@ defmodule GlobalConstBench do
     agent
   end
 
-  defp gen_ets() do
-    tab = :ets.new(:data, [:public, {:read_concurrency, true}])
-    :ets.insert(tab, {:data, gen_services(50)})
+  defp gen_ets(type) do
+    if :ets.whereis(:ets_data) != :undefined do
+      :ets.delete(:ets_data)
+    end
+    tab = :ets.new(:ets_data, [:public, {:read_concurrency, true}])
+    key = gen_key("data", type)
+    :ets.insert(tab, {key, gen_services(50)})
     tab
   end
 
-  defp gen_globalconst(module) do
-    GlobalConst.new(module, %{data: gen_services(50)})
+  defp gen_globalconst(module, type) do
+    key = gen_key("data", type)
+    GlobalConst.new(module, %{key => gen_services(50)})
   end
 
-  defp gen_globalconst(module, count) do
+  defp gen_globalconst(module, count, type) do
     entities =
       0..count
-      |> Enum.map(fn i -> {String.to_atom("key" <> to_string(i)), i} end)
+      |> Enum.map(fn i ->
+        key = gen_key("key" <> to_string(i), type)
+        {key, i}
+      end)
       |> :maps.from_list()
 
     GlobalConst.new(module, entities)
+  end
+
+  defp gen_key(key, :atom) do
+    String.to_atom(key)
+  end
+  defp gen_key(key, :any) do
+    key
   end
 
   defp gen_services(n) do

@@ -10,8 +10,18 @@ defmodule GlobalConst do
       GlobalMap
   """
   def new(module_name, values) do
+    new(module_name, values, [key_type: :atom])
+  end
+
+  @doc """
+  ## Examples
+  ## key_type: :any, :atom
+      iex> GlobalConst.new(GlobalMap, %{a: 1, b: 2}, [key_type: :any])
+      GlobalMap
+  """
+  def new(module_name, values, opt) do
     if :code.is_loaded(module_name) == false or module_name.cmp(values) == false do
-      compile(module_name, values)
+      compile(module_name, values, opt)
     end
 
     true = Code.ensure_loaded?(module_name)
@@ -37,8 +47,12 @@ defmodule GlobalConst do
     this == other
   end
 
-  defp compile(module, values) do
-    keys = Enum.map(values, fn {k, _v} -> to_atom(k) end)
+  defp compile(module, values, opt) do
+    key_type = Keyword.get(opt, :key_type, :atom)
+    keys = case key_type do
+      :atom -> Enum.map(values, fn {k, _v} -> to_atom(k) end)
+      :any -> Enum.map(values, fn {k, _v} -> k end)
+    end
 
     empty_fun = [
       quote do
@@ -64,7 +78,10 @@ defmodule GlobalConst do
 
     functions =
       Enum.reduce(values, empty_fun, fn {k, v}, acc ->
-        key = to_atom(k)
+        key = case key_type do
+          :atom -> to_atom(k)
+          :any -> k
+        end
 
         f =
           quote do

@@ -11,14 +11,19 @@ In our case, we has thousands of entities to save, and don't want to make so man
 So converting entities to a named module is a good approach. 
 
 ## Performance
+Run `mix test`
 
 ```
-benchmark name              iterations   average time
-globalconst get              100000000   0.03 µs/op
-globalconst get(10000keys)   100000000   0.06 µs/op
-fastglobal get                10000000   0.29 µs/op
-ets get                         500000   7.93 µs/op
-agent get                       100000   14.95 µs/op
+## GlobalConstBench
+benchmark name                     iterations   average time
+globalconst get string              100000000   0.04 µs/op
+globalconst get atom                100000000   0.04 µs/op
+globalconst get(10000keys) atom     100000000   0.06 µs/op
+globalconst get(10000keys) string   100000000   0.07 µs/op
+ets get atom                         10000000   0.24 µs/op
+ets get string                       10000000   0.28 µs/op
+fastglobal get                       10000000   0.36 µs/op
+agent get                              100000   19.62 µs/op
 ```
 
 ## Installation
@@ -28,7 +33,7 @@ Add it to `mix.exs`
 ```elixir
 def deps do
   [
-    {:globalconst, "~> 0.2.0"}
+    {:globalconst, "~> 0.3.0"}
   ]
 end
 ```
@@ -40,12 +45,19 @@ Documentation can be found at [https://hexdocs.pm/globalconst/](https://hexdocs.
 Create a new global const map and get the value
 
 ```elixir
-GlobalConst.new(GlobalMap, %{a: 1, b: 2})
+GlobalConst.new(GlobalMap, %{a: 1, b: 2})  # GlobalConst.new(GlobalMap, %{a: 1, b: 2}, [key_type: :atom])
 1 == GlobalMap.get(:a)
 2 == GlobalMap.get(:b)
 [:a, :b] == GlobalMap.keys()
 {:error, :global_const_not_found} = GlobalMap.get(:c)
 :default_value = GlobalMap.get(:c, :default_value)
+
+GlobalConst.new(GlobalMapAny, %{:a => 1, "b" => 2, 3 => 3, [:c] => 4}, [key_type: :any])
+1 == GlobalMapAny.get(:a)
+2 == GlobalMapAny.get("b")
+3 == GlobalMapAny.get(3)
+4 == GlobalMapAny.get([:c])
+
 ```
 
 ## License

@@ -2,11 +2,20 @@ defmodule GlobalConstTest do
   use ExUnit.Case
   doctest GlobalConst
 
-  test "get module" do
-    GlobalConst.new(TestDict, %{a: 1})
+  test "get module atom" do
+    GlobalConst.new(TestDict, %{:a => 1, "b" => 2})
     assert 1 == TestDict.get(:a)
-    assert {:error, :global_const_not_found} == TestDict.get(:b)
-    assert 2 = TestDict.get(:b, 2)
+    assert 2 == TestDict.get(:b)
+    assert {:error, :global_const_not_found} == TestDict.get(:c)
+    assert 3 = TestDict.get(:c, 3)
+  end
+
+  test "get module any" do
+    GlobalConst.new(TestDict, %{:a => 1, "b" => 2, 3 => 3, [:c] => 4}, [key_type: :any])
+    assert 1 == TestDict.get(:a)
+    assert 2 == TestDict.get("b")
+    assert 3 == TestDict.get(3)
+    assert 4 == TestDict.get([:c])
   end
 
   test "thousands keys" do
