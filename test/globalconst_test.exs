@@ -52,5 +52,32 @@ defmodule GlobalConstTest do
     assert Enum.sort(Map.keys(data)) == Enum.sort(mod.keys())
     assert mod.cmp(data) == true
     assert mod.cmp(%{a: 1, c: 2, b: 1, d: 4}) == false
+
+    data = %{:a =>  1, "b"=> 1}
+    mod = GlobalConst.new(DataMap, data)
+    assert Enum.sort(Map.keys(data)) != Enum.sort(mod.keys())
+    assert mod.cmp(data) == true
+    assert mod.cmp(data, [key_type: :any]) == false
+  end
+
+  test "keys and cmp with opt" do
+    data = %{:a =>  1, "b"=> 1}
+    mod = GlobalConst.new(DataMap, data, [key_type: :any])
+    assert Enum.sort(Map.keys(data)) == Enum.sort(mod.keys())
+    assert mod.cmp(data) == false
+    assert mod.cmp(data, [key_type: :any]) == true
+    assert mod.cmp(%{a: 1, c: 2, b: 1, d: 4}) == false
+  end
+
+  test "is recompile" do
+    data = %{:a =>  1, "b"=> 1}
+    GlobalConst.new(DataMap, data, [key_type: :any])
+    m1 = DataMap.module_info() |> Keyword.get(:md5)
+
+    GlobalConst.new(DataMap, data, [key_type: :any])
+    assert m1 == DataMap.module_info() |> Keyword.get(:md5)
+
+    GlobalConst.new(DataMap, data)
+    assert m1 != DataMap.module_info() |> Keyword.get(:md5)
   end
 end

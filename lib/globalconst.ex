@@ -20,7 +20,7 @@ defmodule GlobalConst do
       GlobalMap
   """
   def new(module_name, values, opt) do
-    if :code.is_loaded(module_name) == false or module_name.cmp(values) == false do
+    if :code.is_loaded(module_name) == false or module_name.cmp(values, opt) == false do
       compile(module_name, values, opt)
     end
 
@@ -33,15 +33,16 @@ defmodule GlobalConst do
     :code.delete(module_name)
   end
 
-  def cmp(module_name, other) do
+  def cmp(module_name, other, opt) do
     this =
       module_name.keys()
       |> Enum.map(fn k -> {k, module_name.get(k)} end)
       |> :maps.from_list()
 
+    key_type = Keyword.get(opt, :key_type, :atom)
     other =
       other
-      |> Enum.map(fn {k, v} -> {to_atom(k), v} end)
+      |> Enum.map(fn {k, v} -> {get_key(k, key_type), v} end)
       |> :maps.from_list()
 
     this == other
@@ -49,10 +50,7 @@ defmodule GlobalConst do
 
   defp compile(module, values, opt) do
     key_type = Keyword.get(opt, :key_type, :atom)
-    keys = case key_type do
-      :atom -> Enum.map(values, fn {k, _v} -> to_atom(k) end)
-      :any -> Enum.map(values, fn {k, _v} -> k end)
-    end
+    keys = Enum.map(values, fn {k, _v} -> get_key(k, key_type) end)
 
     empty_fun = [
       quote do
@@ -71,17 +69,21 @@ defmodule GlobalConst do
       end,
       quote do
         def cmp(other) do
-          GlobalConst.cmp(unquote(module), other)
+          cmp(other,  [key_type: :atom])
         end
-      end
+
+        def cmp(other, opt) do
+          GlobalConst.cmp(unquote(module), other, opt)
+        end
+      end,
+      quote do
+        defp opt(), do: unquote(Macro.escape(opt))
+      end,
     ]
 
     functions =
       Enum.reduce(values, empty_fun, fn {k, v}, acc ->
-        key = case key_type do
-          :atom -> to_atom(k)
-          :any -> k
-        end
+        key = get_key(k, key_type)
 
         f =
           quote do
@@ -96,6 +98,13 @@ defmodule GlobalConst do
 
     {:module, ^module, _, _} =
       Module.create(module, mod, file: Atom.to_string(module) <> ".ex", line: 1)
+  end
+
+  defp get_key(key, :any) do
+    key
+  end
+  defp get_key(k, :atom) do
+    to_atom(k)
   end
 
   defp to_atom(k) when is_atom(k) do
