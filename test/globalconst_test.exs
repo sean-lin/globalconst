@@ -1,3 +1,7 @@
+defmodule DummyModule do
+  use GlobalConst.DummyModule
+end
+
 defmodule GlobalConstTest do
   use ExUnit.Case
   doctest GlobalConst
@@ -79,5 +83,18 @@ defmodule GlobalConstTest do
 
     GlobalConst.new(DataMap, data)
     assert m1 != DataMap.module_info() |> Keyword.get(:md5)
+  end
+
+  test "dummy module" do
+    data = %{a: 1, b: 1, c: 2}
+
+    assert {:error, :global_const_not_found} = DummyModule.get(:a)
+    assert :test = DummyModule.get(:a, :test)
+    assert [] = DummyModule.keys()
+    assert false == DummyModule.cmp(data)
+    assert false == DummyModule.cmp(data, [key_type: :any])
+
+    GlobalConst.new(DummyModule, data)
+    assert 1 == DummyModule.get(:a)
   end
 end

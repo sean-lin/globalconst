@@ -60,6 +60,16 @@ GlobalConst.new(GlobalMapAny, %{:a => 1, "b" => 2, 3 => 3, [:c] => 4}, [key_type
 
 ```
 
+Define a DummyModule to stop compiler warning.
+```elixir
+defmodule GlobalMap do
+  use GlobalConst.DummyModule
+end
+GlobalConst.new(GlobalMap, %{a: 1, b: 2}) 
+
+1 == GlobalMap.get(:a)  # no compiler warning here.
+```
+
 ## License
 
 GlobalConst is released under [the MIT License](LICENSE).

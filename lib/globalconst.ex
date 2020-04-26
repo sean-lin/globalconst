@@ -71,7 +71,8 @@ defmodule GlobalConst do
         def cmp(other) do
           cmp(other,  [key_type: :atom])
         end
-
+      end,
+      quote do
         def cmp(other, opt) do
           GlobalConst.cmp(unquote(module), other, opt)
         end
