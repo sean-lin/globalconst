@@ -2,6 +2,8 @@ defmodule GlobalConst do
   @moduledoc """
   Documentation for GlobalConst.
   """
+  
+  @default_opt [key_type: :atom]
 
   @doc """
   ## Examples
@@ -10,7 +12,12 @@ defmodule GlobalConst do
       GlobalMap
   """
   def new(module_name, values) do
-    new(module_name, values, [key_type: :atom])
+    if :code.is_loaded(module_name) == false or module_name.cmp(values) == false do
+      compile(module_name, values, @default_opt)
+    end
+
+    true = Code.ensure_loaded?(module_name)
+    module_name
   end
 
   @doc """
@@ -69,7 +76,7 @@ defmodule GlobalConst do
       end,
       quote do
         def cmp(other) do
-          cmp(other,  [key_type: :atom])
+          cmp(other,  @default_opt)
         end
 
         def cmp(other, opt) do
